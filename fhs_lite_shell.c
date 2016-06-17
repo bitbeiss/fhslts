@@ -5,18 +5,36 @@
  * PURPOSE: Implement a lightweight shell.
  * REFERENCES: "C von A bis Z", Juergen Wolf
  * VERSION: 1.0
- * COMPILE: make; gcc -std=gnu99 -Wall -o fhs_lite_shell fhs_lite_shell.c -lncurses
+ * COMPILE: make
  */
 
 #include "fhs_lite_shell.h"
 
+//Globale Variablen initialisieren
+SCREEN *console_term = NULL;
+SCREEN *stderr_term = NULL;
+char cwd[500]="\0";
+
+
 int main (void) {
-	
-	
-	stderr_term = newterm(NULL,stderr,stderr);
-	console_term = newterm(NULL,stdin,stdout);
-	
-	set_term(console_term);
+	stderr_term = newterm("vt100",stderr,stdin);
+	if (stderr_term == NULL) {
+		endwin();
+		fprintf(stderr,"Fehler beim Anlegen eines stderr/stdin Terminals.");
+		exit(1);
+	}
+	console_term = newterm("vt100",stdout,stdin);
+	if (console_term == NULL) {
+		endwin();
+		fprintf(stderr,"Fehler beim Anlegen eines stdout/stdin Terminals.");
+		exit(1);
+	}
+
+	if (set_term(console_term) == NULL) {
+		endwin();
+		fprintf(stderr,"Fehler beim Umschalten auf einen Terminal.");
+		exit(1);
+	}
 	
 	//Instanz des Verzeichnispuffers fuer pushd und popd anlegen
 	DIR_SAVE *end_verz = NULL;
@@ -32,19 +50,17 @@ int main (void) {
 		stack_ptr->next = NULL;
 	}
 	else {
-		printf("Allozierung des Speichers fuer Kommandoelement fehlgeschlagen!\n");
+		endwin();
+		fprintf(stderr,"Allozierung des Speichers fuer Kommandoelement fehlgeschlagen!\n");
 		exit(1);
 	}
 	
-	//Tastatureingabe Zeichenweise abfragen.
-	
-	initscr();      
+	//Tastatureingabe Zeichenweise abfragen.  
 	keypad (stdscr, TRUE);
 	noecho();
 	PROMPT
 	
 	//Endlosschleife, die die Tastatureingabe verarbeitet solange das Programm laeuft
-	
 	
 	coords coo;
 	coo.c=0;

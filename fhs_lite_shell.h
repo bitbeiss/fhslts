@@ -9,32 +9,40 @@
 */
 
 #ifndef FHSLT
-#define FHSLT
+#define FHSLT fhslt
 
 //External libraries
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <curses.h>
+#include <term.h>
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <wait.h>
 #include <dirent.h>
 #include <unistd.h>
 
+//Globale Variablen
+extern char cwd[500];
+extern SCREEN *console_term;
+extern SCREEN *stderr_term;
+
+
 //Errorcodes
-#define OUT_OF_MEMORY_ERROR 		(1)
-#define UNKNOWN_DIRECTORY_ERROR		(2)
+#define OUT_OF_MEMORY_ERROR 			(1)
+#define UNKNOWN_DIRECTORY_ERROR			(2)
 #define UNKNOWN_FILE_ERROR			(3)
 #define FILE_OPEN_ERROR				(4)
 #define FILE_CLOSE_ERROR			(5)
 
 //Errormessages
-#define OUT_OF_MEMORY_MESSAGE		"Error: Memory full!\n"
-#define UNKNOWN_DIRECTORY_MESSAGE	"Error: Unknown directory\n"
-#define	UNKNOWN_FILE_MESSAGE		"Error: File or path not valid!\n"
+#define OUT_OF_MEMORY_MESSAGE			"Error: Memory full!\n"
+#define UNKNOWN_DIRECTORY_MESSAGE		"Error: Unknown directory\n"
+#define	UNKNOWN_FILE_MESSAGE			"Error: File or path not valid!\n"
 #define FILE_OPEN_MESSAGE			"Error: Could not open file!\n"
 #define FILE_CLOSE_MESSAGE			"Error: Error encountered while closing file!\n"
 
@@ -44,8 +52,6 @@
 //Prompt Definition
 #define PROMPT run_getcwd(); printw("%s>",cwd);
 
-//Globale Variablen
-static char cwd[500];
 
 //------------------------------------
 //Datenstrukturen
@@ -74,10 +80,6 @@ typedef struct Coords {
 	int i;
 	} coords;
 
-//Globale Variablen
-extern SCREEN *console_term;
-extern SCREEN *stderr_term;
-
 //------------------------------------
 //Funktionsprototypen
 int run_popd(DIR_SAVE *);
@@ -91,15 +93,12 @@ int run_fhsdate();
 int run_fhstime();
 int evaluate_expression(command *);
 int handle_key(int, command*, DIR_SAVE*, coords *coo);
+int run_external_command(char*, char*[],int);
 
 //Stackfunktionen
 command* push(command *);
 void show_stack(command *);
 command *reuse(command *);
 int free_stack(command *);
-
-
-	
-
 
 #endif

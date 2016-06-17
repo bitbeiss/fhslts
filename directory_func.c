@@ -27,16 +27,16 @@ int run_chdir(char *parameter){
 
 int run_getcwd(){
 	char *cwd=NULL;
-    getcwd(cwd,sizeof(cwd));
-    if (cwd==NULL) {
+    	getcwd(cwd,sizeof(cwd));
+    	if (cwd==NULL) {
 		set_term(stderr_term);
 		fprintf(stderr, "\nFehler bei getcwd Aufruf: %s\n", strerror(errno));
 		set_term(console_term);
-    } 
-    else {
+    	} 
+    	else {
 		printw("%s\n",cwd);
 		return 0;
-    }
+    	}
     return -1;
 }
 
@@ -57,8 +57,8 @@ int run_ls(char *parameter){
 	}
 	
 	else if (!S_ISDIR(myFile.st_mode)) {
-    // Exists but is not a directory
-    
+    	// Exists but is not a directory
+    	exit(1);
 	}
 	
 	else {

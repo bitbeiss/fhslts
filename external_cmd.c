@@ -11,31 +11,29 @@
 #include "fhs_lite_shell.h"
 
 //Damit laesst sich ein externes commando ausführen - Uebergabe ist getokenizder String inkl. Kommando + Argumente
-int run_external_command(char *command){
+int run_external_command(char *kommando, char *argumente[], int nargs){
 
 
-	pid_t process_id, waitprocess_id;
+	pid_t process_id;
 	int exec_ok;
 	int status;
+	// Prozess clonen (um zu vermeiden, dass der Originalprozess/ die Shell im Fehlerfall terminiert wird
 	process_id = fork();
-	if (process_id == 0)
-	{
-		exec_ok = execvp(&(command[0]), &(command[1]));  //erste Übergabe ist das Kommando, 2. Übergabe sind die Argumente
-		if(exec_ok == -1)
-		{
+	if (process_id == 0) {
+		// Kindprozess laedt das Kommando in den laufenden Prozess
+		exec_ok = execvp(kommando , argumente);  //erste Übergabe ist das Kommando, 2. Übergabe sind die Argumente
+		if(exec_ok == -1) {
 			perror("Error: ");
 		}
 		return -1;
 	}
-	else if (process_id <0)
-	{
+	else if (process_id <0) {
 		perror("Error: ");
 		return -1;
 	}
-	else
-	{
+	else {
 		do {
-			waitprocess_id = waitpid(process_id, &status, WUNTRACED);
+			waitpid(process_id, &status, WUNTRACED);
 		}
 		while(!WIFEXITED(status) && !WIFSIGNALED(status));
 	}

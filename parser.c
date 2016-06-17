@@ -36,6 +36,7 @@ int evaluate_expression(command *stack_ptr){
 
 	//printw("buffer[0]=%s buffer[1]=%s",buffer[0],buffer[1]);
 	
+	//Das entsprechende Kommando aufrufen
 	if(strcmp(buffer[0],"help")==0){
 		run_help(0);
 		}
@@ -56,7 +57,12 @@ int evaluate_expression(command *stack_ptr){
 		}
 	else{
 		printw("\n");
-		system(buffer[0]);
+		//argumente in Liste fuegen
+		char *argumente[10];
+		for (int j=0; j>(i-1); j++) {
+				strcpy(argumente[j],buffer[j+1]);
+		}
+		run_external_command(buffer[0],argumente,i);
 	}
 	return 0;
 }
