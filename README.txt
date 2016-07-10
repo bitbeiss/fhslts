@@ -1,4 +1,5 @@
 COMPILE: "make all" bzw "make clean" 
+ACHTUNG: bitte ein VERZEICHNIS "DEBUG" und "RELEASE" anlegen, wenn nicht vorhanden!
 (Alles wird je nach Einstellung im makefile nach DEBUG oder RELEASE kompiliert.
 Erzeugt wird ein Binary "fhslts" im DEBUG oder RELEASE Verzeichnis.)
 
