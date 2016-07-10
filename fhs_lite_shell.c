@@ -12,32 +12,62 @@
 
 //Globale Variablen initialisieren
 SCREEN *console_term = NULL;
-SCREEN *stderr_term = NULL;
 char cwd[500]="\0";
 
 
-int main (void) {
-	stderr_term = newterm("vt100",stderr,stdin);
-	if (stderr_term == NULL) {
+int main (int arcg, char *argv[]) {
+
+	if ((console_term = newterm("vt100",stdout,stdin)) == NULL) {
 		endwin();
-		fprintf(stderr,"Fehler beim Anlegen eines stderr/stdin Terminals.");
-		exit(1);
-	}
-	console_term = newterm("vt100",stdout,stdin);
-	if (console_term == NULL) {
-		endwin();
-		fprintf(stderr,"Fehler beim Anlegen eines stdout/stdin Terminals.");
+		fprintf(stderr,TERM_CREATE_MESSAGE);
 		exit(1);
 	}
 
 	if (set_term(console_term) == NULL) {
 		endwin();
-		fprintf(stderr,"Fehler beim Umschalten auf einen Terminal.");
+		fprintf(stderr,TERM_SWITCH_MESSAGE);
 		exit(1);
 	}
 	
+	//Buffering deaktivieren
+	if (cbreak() == ERR) {
+		endwin();
+		fprintf(stderr, BUFFER_DEACT_MESSAGE);
+	   	exit(-7);
+	}
+
+	//Echo ausschalten
+	if (noecho()) {
+		endwin();
+	  	fprintf(stderr,NOECHO_MESSAGE);
+	    exit(-8);
+	}
+
+	//Terminalinhalt loeschen
+	if (wclear(curscr)) {
+		endwin();
+		fprintf(stderr, CEAR_MESSAGE);
+	 	exit(-9);
+	}
+
+	if (wrefresh(curscr)) {
+		endwin();
+		fprintf(stderr, REFRESH_MESSAGE);
+	    exit(-10);
+	}
+
+
+	scrollok(stdscr, TRUE);
+
 	//Instanz des Verzeichnispuffers fuer pushd und popd anlegen
-	DIR_SAVE *end_verz = NULL;
+	DIR_SAVE *verz_buff = NULL;
+	if ((verz_buff = malloc(sizeof(DIR_SAVE))) != NULL) {
+		//Verzeichnisbuffer initialisieren
+		verz_buff->next = NULL;
+		verz_buff->previous = NULL;
+		verz_buff->directory[0] = '\0';
+	}
+
 	
 	//Stackpointer Instanz anlegen
 	command *stack_ptr = NULL;
@@ -45,7 +75,8 @@ int main (void) {
 	//Element am unteren Ende des Stack erzeugen.
 	//bzw. Stack initialisieren
 	if ((stack_ptr = malloc(sizeof(command))) != NULL) {
-		strcpy(stack_ptr->cmd,"");
+		//cmd initialisieren
+		strcpy(stack_ptr->cmd,"\0");
 		stack_ptr->previous = NULL;
 		stack_ptr->next = NULL;
 	}
@@ -58,6 +89,8 @@ int main (void) {
 	//Tastatureingabe Zeichenweise abfragen.  
 	keypad (stdscr, TRUE);
 	noecho();
+	printw("Welcome to fhs lite shell v.%s by Clemens J.Zuzan and Florian Hofinger.\n", FHSLTVERSION);
+	printw("Have a lot of fun...\n");
 	PROMPT
 	
 	//Endlosschleife, die die Tastatureingabe verarbeitet solange das Programm laeuft
@@ -69,12 +102,10 @@ int main (void) {
 	coo.i=0;
 	
 	while ((coo.c = getch ()) != 4) {
-		handle_key(coo.c,stack_ptr, end_verz, &coo);
+		stack_ptr = handle_key(coo.c,stack_ptr, verz_buff, &coo);
 	}
 	
-	set_term(console_term);
-	endwin();
-	set_term(stderr_term);
+	//aufraeumen
 	endwin();
 	free_stack(stack_ptr);
 	return 0;

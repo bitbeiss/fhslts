@@ -10,7 +10,11 @@
 
 #include "fhs_lite_shell.h"
 
-int run_echo(char *to_echo){
-	printw("\n%s\n",to_echo);
-	return 0;
+int run_echo(char buffer[][MAX_CHARS_PER_LINE], int rows) {
+	printw("\n");
+	for(int i=1; i<(rows-2);i++){
+		printw("%s ",buffer[i]);
 	}
+	printw("\n");
+	return 0;
+}

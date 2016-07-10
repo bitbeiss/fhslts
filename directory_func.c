@@ -16,7 +16,7 @@ int run_chdir(char *parameter){
 	}
 	
 	else if(strcmp(parameter,"")==0) { 
-		run_help(2);
+		run_help(CD_ERROR);
 		return -1;
 	}
 	else {
@@ -26,38 +26,41 @@ int run_chdir(char *parameter){
 	}
 
 int run_getcwd(){
-	char *cwd=NULL;
-    	getcwd(cwd,sizeof(cwd));
-    	if (cwd==NULL) {
-		set_term(stderr_term);
-		fprintf(stderr, "\nFehler bei getcwd Aufruf: %s\n", strerror(errno));
-		set_term(console_term);
-    	} 
-    	else {
-		printw("%s\n",cwd);
+	char cwd[MAX_LEN_CWD];
+	cwd[0]='\0';
+    getcwd(cwd,sizeof(cwd));
+    if (strlen(cwd)==0) {
+    	endwin();
+    	fprintf(stderr, GET_CWD_MESSAGE);
+    	exit(1);
+    }
+    else {
+    	printw("%s",cwd);
 		return 0;
-    	}
+    }
+    PROMPT
     return -1;
 }
 
 int run_ls(char *parameter){
 	struct stat myFile;
-	if (strcmp(parameter,"\0")==0) {		//Wenn der Parameter leer ist
-		
-				run_help(1); 			//Hilfe aufrufen
-				return -1;
+
+	//printw("\nparameter: %s\n",parameter);
+	if(strlen(parameter)==0) {			// Wenn der Parameter leer ist
+		strcpy(parameter,"./");			// Parameter auf das aktuelle Verzeichnis setzen
+
 			}
-	else if (stat(parameter, &myFile) < 0) {
-		set_term(stderr_term);
-		fprintf(stderr,"Error: file or path not valid!\n");
+	if (stat(parameter, &myFile) < 0) {
+		printw(UNKNOWN_FILE_MESSAGE);
 		refresh();
-		set_term(console_term);
-		run_help(1);
+		run_help(LS_ERROR);
 		return -1;
 	}
 	
 	else if (!S_ISDIR(myFile.st_mode)) {
     	// Exists but is not a directory
+		endwin();
+		fprintf(stderr,FILE_EXISTS_BUT_NOT_DIR_MESSAGE);
     	exit(1);
 	}
 	
@@ -65,19 +68,21 @@ int run_ls(char *parameter){
 		DIR *dp;
 		struct dirent *ep;
 
-		dp = opendir ("./");
+		dp = opendir (parameter);
 		printw("\n");
 		if (dp != NULL)
 			{
-				while ((ep = readdir (dp)) )
+				while ((ep = readdir (dp))!=NULL )
 				printw("%s\n",ep->d_name);
 				(void) closedir (dp);
 			}
 	
 		else {
-			perror ("Couldn't open the directory");
+			printw(FILE_OPEN_MESSAGE);
+			//perror(FILE_OPEN_MESSAGE);
 		}
   
 	}
 	return 0;
 }
+

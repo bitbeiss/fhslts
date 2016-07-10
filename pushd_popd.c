@@ -10,47 +10,81 @@
 
 #include "fhs_lite_shell.h"
 
-//Speichert das aktuelle Verzeichnis in den Stack, Übergabe ist der ptr auf das zuletzt gespeicherte Verzeichnis
-int run_pushd(DIR_SAVE *end_verz){
-	char buffer[80];
-	DIR_SAVE *ptr_help = end_verz;
+
+
+//Speichert das aktuelle Verzeichnis in den Stack,
+//Uebergabe Parameter ist der ptr auf das zuletzt gespeicherte Verzeichnis
+int run_pushd(DIR_SAVE *verz_buff){
+	char buffer[MAX_CHARS_PER_LINE];
+
+	//zum obersten Element im Stack gehen
+	verz_buff = get_top_pointer(verz_buff);
+
+	DIR_SAVE *ptr_help = verz_buff;
+
+
 
 	//Neues Verzeichnis-Element anlegen.
-	if ((end_verz = malloc(sizeof(DIR_SAVE))) != NULL) {
+	if ((verz_buff = malloc(sizeof(DIR_SAVE))) != NULL) {
 		//Zeiger im neuen Element setzen.
-		end_verz->previous = ptr_help;
-		end_verz->next = NULL;
-		
-		//speichert aktuelles Verzeichnis
-		if(NULL != getcwd(buffer,80)){
-			strcpy(end_verz->directory,buffer);
+		verz_buff->previous = ptr_help;
+		verz_buff->next = NULL;
+		verz_buff->directory[0] = '\0';
+
+		//Speichert aktuelles Verzeichnis.
+		if(NULL != getcwd(buffer,80) ){
+			strcpy(verz_buff->directory,buffer);
 		}
-		else{
-			printf("Konnte Verzeichnis nicht finden!");
-			return -1;
+		else {
+			printw(DIR_MISSING_MESSAGE);
+			return 1;
 		}
 
-		//next Zeiger im darunterliegenden Element aktualisieren.
-		end_verz->previous->next = end_verz;
-		printf("Verzeichnis %s gespeichert", end_verz->directory);
+		//"next" Zeiger im darunterliegenden Element aktualisieren.
+		verz_buff->previous->next = verz_buff;
+
+		printw(SAVED_DIR_MESSAGE);
+		printw("%s\n",verz_buff->directory);
 		return 0;
 	}
 	else {
-		printf("Allozierung des Speichers Verzeichnis fehlgeschlagen!\n");
-		return -1;
+		printw(OUT_OF_MEMORY_MESSAGE);
+		return 1;
 		}
 }
 
-//wechselt in letztes gespeichertes Verzeichnis und löscht es aus dem Stack .. Übergabe ist der ptr auf das letzte Verzeichnis
-int run_popd(DIR_SAVE *end_verz){
-	char *help=NULL;
+//Wechselt in letztes gespeichertes Verzeichnis und loescht es aus dem Stack
+//Uebergabe ist der ptr auf das letzte Verzeichnis
+int run_popd(DIR_SAVE *verz_buff) {
+	char help[MAX_CHARS_PER_LINE];
+	help[0] = '\0';
+
+	//zum obersten Element im Stack gehen
+	verz_buff = get_top_pointer(verz_buff);
+
+	//Nachsehen, ob noch ein Verzeichnis im Stack ist.
+	if (verz_buff->previous==NULL) {
+		printw(NO_MORE_DIR_IN_STACK_MESSAGE);
+		return 1;
+	}
+
 	DIR_SAVE *help_ptr;
-	help_ptr = end_verz;
-	strcpy(help, end_verz->directory);
-	chdir(help);
-	printf("Aktuelles Verzeichnis: %s", help);
-	end_verz = help_ptr->previous;
-	end_verz->next = NULL;
+	help_ptr = verz_buff;
+	strcpy(help, verz_buff->directory);
+	//chdir(help);
+
+	// Verzeichnis ausgeben
+	printw("\n%s\n", help);
+	verz_buff = help_ptr->previous;
+	verz_buff->next = NULL;
 	free(help_ptr);
 	return 0;
 }
+
+DIR_SAVE *get_top_pointer(DIR_SAVE *verz_buff) {
+	while (verz_buff->next!=NULL) {
+		verz_buff = verz_buff->next;
+		}
+	return verz_buff;
+	}
+

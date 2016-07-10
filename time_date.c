@@ -26,6 +26,6 @@ int run_fhstime(){
 	time1 = time(NULL);
 	time2 = localtime(&time1);
 	strcpy(zeit,asctime(time2));
-	printw("\n%s\n",zeit);
+	printw("\n%s",zeit);
 	return 0;
 	}

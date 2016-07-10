@@ -12,25 +12,38 @@
 
 //Damit laesst sich ein externes commando ausführen - Uebergabe ist getokenizder String inkl. Kommando + Argumente
 int run_external_command(char *kommando, char *argumente[], int nargs){
+	//keine Argumente...
+	if (nargs==0) {
+		strcpy(argumente[0],kommando);
+		argumente[1] = NULL;
+	}
 
 
 	pid_t process_id;
 	int exec_ok;
 	int status;
-	// Prozess clonen (um zu vermeiden, dass der Originalprozess/ die Shell im Fehlerfall terminiert wird
+
+	// Prozess clonen, um zu vermeiden, dass der Originalprozess/die Shell im Fehlerfall terminiert wird
 	process_id = fork();
+	//Kindprozess: Ausfuehren ohne Reue... :D
 	if (process_id == 0) {
 		// Kindprozess laedt das Kommando in den laufenden Prozess
-		exec_ok = execvp(kommando , argumente);  //erste Übergabe ist das Kommando, 2. Übergabe sind die Argumente
+		// erste Uebergabe ist das Kommando, 2. Uebergabe sind die Argumente
+		exec_ok = execvp(kommando , argumente);
 		if(exec_ok == -1) {
-			perror("Error: ");
+
+			printw("\nError: %s\n",strerror(errno));
+			endwin();
+			exit(1);
 		}
-		return -1;
+		return 0;
 	}
+	//Kindprozess kann nicht starten - Fehler
 	else if (process_id <0) {
-		perror("Error: ");
-		return -1;
+		printw("\nError: %s\n",strerror(errno));
+		return 1;
 	}
+	//Auf den Kindprozess warten
 	else {
 		do {
 			waitpid(process_id, &status, WUNTRACED);
