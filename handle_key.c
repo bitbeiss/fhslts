@@ -85,9 +85,6 @@ command * handle_key(int key, command *stack_ptr, DIR_SAVE *verz_buff, coords *c
 			break;
 				
 		case KEY_ENTER_CUSTOM:
-			printw("\nkey custom\n");
-
-
 
 			if (verb==1) printw("KEY_ENTER_CUSTOM: %d\n",key);
 			//Fall: next Zeiger am Stapel nicht Null: Wir sind im Inneren des Stapels.
@@ -97,7 +94,6 @@ command * handle_key(int key, command *stack_ptr, DIR_SAVE *verz_buff, coords *c
 				stack_ptr = reuse(stack_ptr);
 				if(verb==1) printw("executing cmd...\n");
 				evaluate_expression(stack_ptr,verz_buff);
-				//printw("\nKommando derzeit: %s\n",stack_ptr->cmd);
 				stack_ptr = push(stack_ptr);
 			}
 			else {
@@ -105,9 +101,9 @@ command * handle_key(int key, command *stack_ptr, DIR_SAVE *verz_buff, coords *c
 				//Fall: alles normal, sind oben am Stapel -
 				//push-back durchfuehren....
 
-
 				//Ausdruck auswerten
 				if(verb==1) printw("Evaluating...\n");
+				//printw("\nKommando derzeit: %s\n",stack_ptr->cmd);
 				evaluate_expression(stack_ptr,verz_buff);
 
 				//Ausdruck auf den Kommando Stack "ablegen" indem neues Kommando auf Spitze des Stack angelegt wird.

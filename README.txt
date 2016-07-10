@@ -10,3 +10,5 @@ Fehlern beim Kompilieren fuehren kann.
 Die Shell wurde nur auf SuSE Linux letztgetestet, es sollten sich aber keine wesentlichen Differenzen zu
 Ubuntu ergeben.
 
+Bugs: fhsdate und fhstime funktionieren momentan leider nicht. (Segmentation fault.)
+

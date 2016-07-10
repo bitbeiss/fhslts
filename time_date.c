@@ -15,7 +15,7 @@ int run_fhsdate(){
 	time_t tnow;
 	time(&tnow);
 	tmnow = localtime(&tnow);
-	printw("\n%d.%d.%d\n",tmnow->tm_mday,tmnow->tm_mon +1, tmnow->tm_year + 1900);
+	printf("\n%d.%d.%d\n",tmnow->tm_mday,tmnow->tm_mon +1, tmnow->tm_year + 1900);
 	return 0;
 	}
 
@@ -23,9 +23,9 @@ int run_fhstime(){
 	time_t time1;
 	struct tm *time2;
 	char zeit[25];
-	time1 = time(NULL);
+	time1 = time(NULL);				//Zeitobjekt mit momentaner Zeit zurueckgeben
 	time2 = localtime(&time1);
 	strcpy(zeit,asctime(time2));
-	printw("\n%s",zeit);
+	printf("\n%s",zeit);
 	return 0;
 	}
