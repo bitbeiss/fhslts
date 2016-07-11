@@ -85,7 +85,6 @@ command * handle_key(int key, command *stack_ptr, DIR_SAVE *verz_buff, coords *c
 			break;
 				
 		case KEY_ENTER_CUSTOM:
-
 			if (verb==1) printw("KEY_ENTER_CUSTOM: %d\n",key);
 			//Fall: next Zeiger am Stapel nicht Null: Wir sind im Inneren des Stapels.
 			//es handelt sich... um eine Wiederverwendung eines Befehles durch den User!
@@ -104,6 +103,7 @@ command * handle_key(int key, command *stack_ptr, DIR_SAVE *verz_buff, coords *c
 				//Ausdruck auswerten
 				if(verb==1) printw("Evaluating...\n");
 				//printw("\nKommando derzeit: %s\n",stack_ptr->cmd);
+
 				evaluate_expression(stack_ptr,verz_buff);
 
 				//Ausdruck auf den Kommando Stack "ablegen" indem neues Kommando auf Spitze des Stack angelegt wird.

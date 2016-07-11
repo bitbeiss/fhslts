@@ -14,20 +14,25 @@
 int evaluate_expression(command *stack_ptr, DIR_SAVE *verz_buff){
 	//tokenize and parse expression
 	//printw("\nEvaluating expression... %s\n",stack_ptr->cmd);
-	
+
 	char *ptr;
 	char buffer[9][MAX_CHARS_PER_LINE];
 	
+
 
 	for(int i=0; i<MAX_ECHO_BUFFER_ARGS;i++){
 		buffer[i][0]='\0';
 	}
 
+
+	int number_of_param=0;
 	//Delimiter hier ausschließlich "Leerzeichen"
+	
+
 	ptr = strtok(stack_ptr->cmd," ");
 	//printw("\ncmd: %s, val:%s\n",stack_ptr->cmd,ptr);
-	
-	int number_of_param=0;
+
+
 	while(ptr != NULL) {
 		//printw("val:%s\n",ptr);
 		strcpy(buffer[number_of_param],ptr);
@@ -35,6 +40,8 @@ int evaluate_expression(command *stack_ptr, DIR_SAVE *verz_buff){
 		number_of_param++;
 		if (number_of_param>=MAX_PARAMETERS) break;
 		}
+
+
 
 	//printw("buffer[0]=%s buffer[1]=%s",buffer[0],buffer[1]);
 	
@@ -116,8 +123,7 @@ int evaluate_expression(command *stack_ptr, DIR_SAVE *verz_buff){
 		endwin();
 		exit(0);
 	}
-	else{
-		printw("\n");
+	else {
 		//Argumente in Liste fuegen
 		char *argumente[MAX_CHARS_PER_LINE];
 		int j;

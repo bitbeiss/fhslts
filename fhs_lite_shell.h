@@ -34,14 +34,16 @@
 #define MAX_CHARS_PER_LINE 500
 //max. Argumente, die an echo uebergeben werden koennen/duerfen.
 //Achtung: zu hohe Angabe kann zu Segmentation Fault fuehren!
-#define MAX_ECHO_BUFFER_ARGS 20
+#define MAX_ECHO_BUFFER_ARGS 10
+
+#define CWDCHARS 500
 
 //Globale Variablen
-extern char cwd[500];
+extern char cwd[CWDCHARS];
 extern SCREEN *console_term;
 
 //Konstanten
-#define MAX_LEN_CWD	1000
+#define MAX_LEN_CWD	200
 
 //Errorcodes
 #define OUT_OF_MEMORY_ERROR 			(1)

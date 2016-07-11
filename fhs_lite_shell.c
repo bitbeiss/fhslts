@@ -12,10 +12,11 @@
 
 //Globale Variablen initialisieren
 SCREEN *console_term = NULL;
-char cwd[500]="\0";
 
+char cwd[CWDCHARS];
 
 int main (int arcg, char *argv[]) {
+	strcpy(cwd,"\0");
 
 	if ((console_term = newterm("vt100",stdout,stdin)) == NULL) {
 		endwin();
@@ -82,7 +83,7 @@ int main (int arcg, char *argv[]) {
 	}
 	else {
 		endwin();
-		fprintf(stderr,"Allozierung des Speichers fuer Kommandoelement fehlgeschlagen!\n");
+		fprintf(stderr,OUT_OF_MEMORY_MESSAGE);
 		exit(1);
 	}
 	
@@ -100,7 +101,7 @@ int main (int arcg, char *argv[]) {
 	coo.x=0;
 	coo.y=0;
 	coo.i=0;
-	
+
 	while ((coo.c = getch ()) != 4) {
 		stack_ptr = handle_key(coo.c,stack_ptr, verz_buff, &coo);
 	}
