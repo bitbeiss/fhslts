@@ -28,8 +28,10 @@ int evaluate_expression(command *stack_ptr, DIR_SAVE *verz_buff){
 	int number_of_param=0;
 	//Delimiter hier ausschließlich "Leerzeichen"
 	
+	char rettet_das_kommando[MAX_CHARS_PER_LINE];
+	strcpy(rettet_das_kommando,stack_ptr->cmd);
 
-	ptr = strtok(stack_ptr->cmd," ");
+	ptr = strtok(rettet_das_kommando," ");
 	//printw("\ncmd: %s, val:%s\n",stack_ptr->cmd,ptr);
 
 
@@ -64,7 +66,7 @@ int evaluate_expression(command *stack_ptr, DIR_SAVE *verz_buff){
 				run_help(ECHO_ERROR); }
 			else if(strcmp(buffer[1],"pwd")==0) {
 				run_help(PWD_ERROR); }
-			else if(strcmp(buffer[1],"execute")==0) {
+			else if(strcmp(buffer[1],"exec")==0) {
 				run_help(EXECUTE_ERROR); }
 			else if(strcmp(buffer[1],"pushd")==0) {
 				run_help(PUSHD_ERROR); }
@@ -133,7 +135,9 @@ int evaluate_expression(command *stack_ptr, DIR_SAVE *verz_buff){
 		}
 		//zu uebergebendes Array sollte NULL terminiert sein.
 		argumente[j+1] = NULL;
-		run_external_command(buffer[0],argumente,number_of_param);
+		//Einkommentieren, um alle intrinsisch nicht bekannten befehle als externe Befehle auszufuehren.
+		//run_external_command(buffer[0],argumente,number_of_param);
+		//printw("\n");
 	}
 return 0;
 }

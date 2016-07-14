@@ -12,9 +12,18 @@
 #define FHSLT fhslt
 #define FHSLTVERSION "1.1"
 
+//OSX spezifische inkludes
+#ifdef __MACH__
+#include <mach/clock.h>
+#include <mach/mach.h>
+#include <sys/wait.h>
+#endif
+
+
+
 //External libraries
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <errno.h>
 #include <curses.h>
 #include <term.h>
@@ -23,7 +32,11 @@
 #include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#ifndef __MACH__
 #include <wait.h>
+#endif
+
 #include <dirent.h>
 #include <unistd.h>
 
@@ -127,6 +140,10 @@ typedef struct Coords {
 	int c;
 	int y;
 	int x;
+
+	int x0; //x Position nach Prompt
+	int y0; //y Position nach Prompt
+
 	int i;
 	} coords;
 

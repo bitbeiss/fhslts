@@ -101,6 +101,10 @@ int main (int arcg, char *argv[]) {
 	coo.x=0;
 	coo.y=0;
 	coo.i=0;
+	coo.y0=0;
+	coo.x0=0;
+
+	getyx(stdscr, coo.y0, coo.x0);
 
 	while ((coo.c = getch ()) != 4) {
 		stack_ptr = handle_key(coo.c,stack_ptr, verz_buff, &coo);

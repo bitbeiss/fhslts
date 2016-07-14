@@ -29,9 +29,10 @@ command * handle_key(int key, command *stack_ptr, DIR_SAVE *verz_buff, coords *c
 					
 				//Prompt und Kommando neu schreiben.
 				PROMPT
+				getyx(stdscr, c->y0, c->x0);
 				printw("%s",stack_ptr->cmd);
 				//Positionszaehler auf momentane Position setzen.
-				c->i=c->x;
+				c->i=strlen(stack_ptr->cmd);
 			}
 			else break;
 			break;
@@ -48,9 +49,10 @@ command * handle_key(int key, command *stack_ptr, DIR_SAVE *verz_buff, coords *c
 					
 				//Prompt und Kommando neu schreiben.
 				PROMPT
+				getyx(stdscr, c->y0, c->x0);
 				printw("%s",stack_ptr->cmd);
 				//Positionszaehler auf momentane Position setzen.
-				c->i=c->x;
+				c->i=strlen(stack_ptr->cmd);
 			}
 			else break;
 			break;
@@ -69,17 +71,43 @@ command * handle_key(int key, command *stack_ptr, DIR_SAVE *verz_buff, coords *c
 			
 		case KEY_BACKSPACE_LINUX:
 			if (verb==1) printw ("KEY_BACKSPACE: %d\n",key);
+
+			getyx(stdscr, c->y, c->x);
+			//printw("i:%i\n",c->i);
 			if ( (c->i) > 0) {
-				(c->i)--;
-				//inhalt der Zeile ein Zeichen abzwacken
-				stack_ptr->cmd[(c->i)]='\0';
-				getyx(stdscr, c->y, c->x);
+
+				//Inhalt der Zeile ein Zeichen abzwacken
+				//(c->i)--;
+				//stack_ptr->cmd[(c->i)]='\0';
+
+				//Zeile umschreiben/momentane pos auslassen.
+
+				int len = c->i;
+				int ii = 0;
+
+				char cmd_tmp[MAX_CHARS_PER_LINE];
+				//printw("c->i: %i\n",c->i);
+				int j;
+				for(j=0; j<=len; j++) {
+					//printw("%c",stack_ptr->cmd[ii]);
+					// Die derzeitige Position beim Umschreiben ueberspringen
+					// (Vom Promptende aus gesehen im Kommando)
+					if(j==abs(c->x0 - (c->x-1))){
+						j++;
+						c->i--;
+					}
+					cmd_tmp[ii] = stack_ptr->cmd[j];
+					ii++;
+				}
+				strcpy(stack_ptr->cmd,cmd_tmp);
+
 				//Zeile loeschen
 				move(c->y, 0);
 				clrtoeol();
 				//Prompt neu aufbauen
 				PROMPT
 				printw("%s",stack_ptr->cmd);
+				move(c->y,c->x-1);
 			}
 			else break;
 			break;
@@ -90,9 +118,13 @@ command * handle_key(int key, command *stack_ptr, DIR_SAVE *verz_buff, coords *c
 			//es handelt sich... um eine Wiederverwendung eines Befehles durch den User!
 			if (stack_ptr->next != NULL){
 				if(verb==1) printw("reusing cmd...\n");
+
+				//Kommando in den Speicher des obersten (leeren) Stackelements kopieren.
 				stack_ptr = reuse(stack_ptr);
 				if(verb==1) printw("executing cmd...\n");
+
 				evaluate_expression(stack_ptr,verz_buff);
+				//jetzt erst Push ausfuehren
 				stack_ptr = push(stack_ptr);
 			}
 			else {
@@ -102,8 +134,6 @@ command * handle_key(int key, command *stack_ptr, DIR_SAVE *verz_buff, coords *c
 
 				//Ausdruck auswerten
 				if(verb==1) printw("Evaluating...\n");
-				//printw("\nKommando derzeit: %s\n",stack_ptr->cmd);
-
 				evaluate_expression(stack_ptr,verz_buff);
 
 				//Ausdruck auf den Kommando Stack "ablegen" indem neues Kommando auf Spitze des Stack angelegt wird.
@@ -113,24 +143,37 @@ command * handle_key(int key, command *stack_ptr, DIR_SAVE *verz_buff, coords *c
 
 			//Prompt leer wieder aufbauen.
 			PROMPT
-			//Positionszaehler zuruecksetzen.
+			//Position des Prompts sichern
+			getyx(stdscr, c->y0, c->x0);
+			//Positionszaehler auf leer zuruecksetzen.
 			c->i=0;
 			break;
 				
 		default:
 			//Zeichen zu Kommandopuffer hinzufuegen (wenn keine Sondertaste)
 			if (verb==1) printw ("Tastaturcode %d\n", key);
-			stack_ptr->cmd[(c->i)] = key;
-			stack_ptr->cmd[(c->i)+1] = '\0';
-			(c->i)++;
+			//stack_ptr->cmd[(c->i)] = key;
+			//stack_ptr->cmd[(c->i)+1] = '\0';
+			getyx(stdscr, c->y, c->x);
+			stack_ptr->cmd[(abs(c->x0 - c->x))] = key;
+			//printw("\npos: %i, key: %c\n",(abs(c->x0 - c->x)), key);
+			if((abs(c->x - c->x0) >= c->i )) {
+				(c->i)++;
+				stack_ptr->cmd[(c->i+1)] = '\0';
+			}
+			(c->x)++;
+			move(c->y,c->x);
+
 
 			//Bisher eingegebenes Kommando wieder aufbauen (nachdem der gedrueckte Key behandelt wurde.)
-			getyx(stdscr, c->y, c->x);
+			//getyx(stdscr, c->y, c->x);
 			move(c->y, 0);
 			clrtoeol();
 			if (verb==1) printw("\nBisher eingegebenes Kdo. wieder aufgebaut\n");
 			PROMPT
+			getyx(stdscr, c->y0, c->x0);
 			printw("%s",stack_ptr->cmd);
+			move(c->y,c->x);
 	}
 
 return stack_ptr;

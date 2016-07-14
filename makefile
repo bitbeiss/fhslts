@@ -24,10 +24,10 @@ objects=$(addprefix $(builddir), fhs_lite_shell.o command_stack.o parser.o pushd
 	
 
 $(builddir)fhs_lite_shell.o: fhs_lite_shell.c fhs_lite_shell.h
-		gcc -Wall $(mode) -std=gnu99 -c fhs_lite_shell.c -o $(builddir)fhs_lite_shell.o -I$(includedir) -lcurses
+		gcc -Wall $(mode) -std=gnu99 -c fhs_lite_shell.c -o $(builddir)fhs_lite_shell.o -I$(includedir) #-lcurses
 		
 $(builddir)command_stack.o: command_stack.c fhs_lite_shell.h
-		gcc -Wall $(mode) -std=gnu99 -c command_stack.c -o $(builddir)command_stack.o -I$(includedir) -lcurses
+		gcc -Wall $(mode) -std=gnu99 -c command_stack.c -o $(builddir)command_stack.o -I$(includedir) #-lcurses
 		
 $(builddir)parser.o: parser.c fhs_lite_shell.h
 		gcc -Wall $(mode) -std=gnu99 -c parser.c -o $(builddir)parser.o
@@ -36,16 +36,16 @@ $(builddir)pushd_popd.o: pushd_popd.c fhs_lite_shell.h
 		gcc -Wall $(mode) -std=gnu99 -c pushd_popd.c -o $(builddir)pushd_popd.o  $(builddir)fhs_lite_shell.o
 
 $(builddir)handle_key.o: handle_key.c fhs_lite_shell.h
-		gcc -Wall $(mode) -std=gnu99 -c handle_key.c -o $(builddir)handle_key.o -I$(includedir) -lcurses
+		gcc -Wall $(mode) -std=gnu99 -c handle_key.c -o $(builddir)handle_key.o -I$(includedir) #-lcurses
 
 $(builddir)external_cmd.o: external_cmd.c fhs_lite_shell.h
 		gcc -Wall $(mode) -std=gnu99 -c external_cmd.c -o $(builddir)external_cmd.o
 
 $(builddir)time_date.o: time_date.c fhs_lite_shell.h
-		gcc -Wall $(mode) -std=gnu99 -c time_date.c -o $(builddir)time_date.o -I$(includedir) -lcurses
+		gcc -Wall $(mode) -std=gnu99 -c time_date.c -o $(builddir)time_date.o -I$(includedir) #-lcurses
 
 $(builddir)help.o: help.c fhs_lite_shell.h
-		gcc -Wall $(mode) -std=gnu99 -c help.c -o $(builddir)help.o -I$(includedir) -lcurses
+		gcc -Wall $(mode) -std=gnu99 -c help.c -o $(builddir)help.o -I$(includedir) #-lcurses
 
 $(builddir)directory_func.o: directory_func.c fhs_lite_shell.h
 		gcc -Wall $(mode) -std=gnu99 -c directory_func.c -o $(builddir)directory_func.o -I$(includedir) -lcurses  $(builddir)fhs_lite_shell.o
@@ -53,9 +53,21 @@ $(builddir)directory_func.o: directory_func.c fhs_lite_shell.h
 $(builddir)echo.o: echo.c fhs_lite_shell.h
 		gcc -Wall $(mode) -std=gnu99 -c echo.c -o $(builddir)echo.o
 
-fhslt: $(objects)
-		gcc -Wall $(mode) -std=gnu99 -v -o $(builddir)fhslt  $(objects) -I$(includedir) -lcurses -ltinfo
+#Bestimmung des verwendeten Betriebssystems
+ifeq ($(OS),Windows_NT)
+    uname_S := Windows
+else
+    uname_S := $(shell uname -s)
+endif
 
+#Um auch auf OSX zu kompilieren, darf ltinfo nicht extra eingebunden werden.
+#Unter Linux natuerlich schon.
+fhslt: $(objects)
+ifeq ($(uname_S),Darwin)
+	gcc -Wall $(mode) -std=gnu99 -v -o $(builddir)fhslt  $(objects) -I$(includedir) -lcurses
+else
+	gcc -Wall $(mode) -std=gnu99 -v -o $(builddir)fhslt  $(objects) -I$(includedir) -lcurses -ltinfo
+endif
 
 all: fhslt 
 

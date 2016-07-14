@@ -71,11 +71,9 @@ command *reuse(command *stack_ptr){
 	command *stack_ptr_top;
 	stack_ptr_top = get_stack_top_pointer(stack_ptr);
 		
-	//Neues Befehlselement "offiziell" oben auf den Stack legen.
-	//Dabei wird dann das neue oberste  (leere) Element angelegt.
-
+	//Befehlselement "offiziell" in den obersten Stack kopiert.
 	strcpy(stack_ptr_top->cmd, stack_ptr->cmd);
-	//stack_ptr = push(stack_ptr_top);
+	//Stapel auf das oberste Elment zeigen lassen
 	stack_ptr = stack_ptr_top;
 	return (stack_ptr);
 }
